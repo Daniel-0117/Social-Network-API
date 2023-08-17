@@ -68,7 +68,7 @@ module.exports = {
     }
 };
 
-//update a user by id
+//delete a user
 module.exports = {
     async deleteUser({ params }, res) {
         const peasantCount = await peasantCount();
@@ -89,3 +89,38 @@ module.exports = {
         .catch(err => res.json(err));
     }
 };
+
+//add a friend
+module.exports = {
+    addFriend({ params }, res) {
+        User.findOneAndUpdate(
+            { _id: params.id },
+            { $push: { friends: params.friendId } },
+            { new: true, runValidators: true }
+        )
+        .then(dbUserData => {
+            if(!dbUserData) {
+                res.status(404).json({ message: 'No peasant found with this id!' });
+                return;
+            }
+            res.json(dbUserData);
+        })
+        .catch(err => res.json(err));
+    }   
+};
+
+//delete a friend
+module.exports = {
+    deleteFriend({ params }, res) {
+        User.findOneAndUpdate(
+            { _id: params.id },
+            { $pull: { friends: params.friendId } },
+            { new: true }
+        )
+        .then(dbUserData => res.json(dbUserData))
+        .catch(err => res.json(err));
+    }
+};
+
+module.exports = userController;
+
