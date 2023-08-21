@@ -63,5 +63,5 @@ const Thought = new Schema(
 
 
 
-module.exports = { Thought, Reaction };
+module.exports = Thought, Reaction;
   

@@ -1,21 +1,12 @@
-const { User, Thought } = require('../models/User');
+const User = require('../models/User');
 
 //Get all Users
 module.exports = {
     
     async getAllUsers(req, res) {
         try {
-            const dbUserData = await User.find()
-            .populate({
-                path: 'thoughts',
-                select: '-__v'
-            })
-            .populate({
-                path: 'friends',
-                select: '-__v'
-            })
-            .select('-__v');
-            res.json(dbUserData);
+            const allUsers = await User.find({});
+            res.json(allUsers);
         } catch (err) {
             console.log(err);
             res.sendStatus(400);
@@ -27,26 +18,19 @@ module.exports = {
 
   async getUserById({ params }, res) {
     try {
-      const dbUserData = await User.findOne({ _id: params.id })
-      .populate({
-          path: 'thoughts',
-          select: '-__v'
-      })
-      .populate({
-          path: 'friends',
-          select: '-__v'
-      })
+      const oneUser = await User.findOne({ _id: params.id })
       .select('-__v');
-      if (!dbUserData) {
+      if (!oneUser) {
         res.status(404).json({ message: 'No peasant found with this id!' });
         return;
       }
-      res.json(dbUserData);
-    } catch (err) {
-      console.log(err);
-      res.sendStatus(400);
-    }
-  },
+      res.json(oneUser);
+
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(400);
+  }
+},
 
 
 //create a new user
@@ -83,60 +67,54 @@ async updateUser({ params, body }, res) {
 //delete a user
 
     async deleteUser({ params }, res) {
-        const peasantCount = await peasantCount();
-        if (peasantCount <= 1) {
-            return res.status(400).json({ message: 'You cannot delete the last peasant!' });
-        }
-        User.findOneAndDelete({ _id: params.id })
-        .then(dbUserData => {
-            if(!dbUserData) {
+        try {
+            const dbUserData = await User.findOneAndDelete({ _id: params.id });
+            if (!dbUserData) {
                 res.status(404).json({ message: 'No peasant found with this id!' });
                 return;
             }
-            return Thought.deleteMany({ _id: { $in: dbUserData.thoughts } });
-        })
-        .then(() => {
-            res.json({ message: 'Peasant has been removed from the kingdom!' });
-        })
-        .catch(err => res.json(err));
+            res.json(dbUserData);
+        } catch (err) {
+            console.log(err);
+            res.sendStatus(400);
+        }
     },
 
 
 //add a friend
 
-    async addFriend({ params }, res) {
-        User.findOneAndUpdate(
-            { _id: params.id },
-            { $push: { friends: params.friendId } },
-            { new: true, runValidators: true }
-        )
-        .then(dbUserData => {
-            if(!dbUserData) {
-                res.status(404).json({ message: 'No peasant found with this id!' });
-                return;
-            }
-            res.json(dbUserData);
-        })
-        .catch(err => res.json(err));
-    }, 
+    
+      async addFriend(req, res) {
+        try {
+          const result = await User.findOneAndUpdate(
+            { _id: req.params.userId },
+            {  $addToSet: { friends: req.params.friendId } }
+            );
+          console.log(result)
+          res.status(200).json(result)
+        } catch (error) {
+          console.log(error);
+          res.status(500).json({ message: 'something went wrong' });
+        }
+      },
+     
 
 
 //delete a friend
 
-  async removeFriend({ params }, res) {
-    User.findOneAndUpdate(
-        { _id: params.id },
-        { $pull: { friends: params.friendId } },
-        { new: true }
-    )
-    .then(dbUserData => {
-        if(!dbUserData) {
-            res.status(404).json({ message: 'No peasant found with this id!' });
-            return;
-        }
-        res.json(dbUserData);
-    })
-    .catch(err => res.json(err));
+async removeFriend(req, res) {
+  try {
+    const result = await User.findOneAndUpdate(
+      { _id: req.params.userId },
+      {  $pull: { friends: req.params.friendId } }
+      );
+      console.log(result)
+    console.log('Deleted friend from friend list')
+    res.status(200).json(result)
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'something went wrong' });
+  }
 }
 
 };
