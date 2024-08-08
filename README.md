@@ -1,6 +1,6 @@
 # Social-Network-API
 
-Live deployed link or Walkthrough: https://drive.google.com/file/d/19fQJA_uG0ie9sNRVpZEN96YuTgQ2oZU8/view
+Live deployed link or Walkthrough: https://drive.google.com/file/d/1UTyo-A1SGAtruYaEPtYpILLMl8nvikwy/view?usp=sharing
 
 ![Static Badge](https://img.shields.io/badge/MIT-license?label=license&labelColor=%2332CD30&color=%23A020F0&link=https%3A%2F%2Fopensource.org%2Flicense%2Fmit%2F)
 
