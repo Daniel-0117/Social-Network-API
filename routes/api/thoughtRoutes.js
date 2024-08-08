@@ -11,13 +11,15 @@ const {
 
 router.route('/').get(getThoughts).post(addThought);
 
-router.route('/:thoughtId')  // Ensure this matches the controller parameter
+router.route('/:thoughtId')  
     .get(getThoughtById)
     .put(updateThought)
     .delete(removeThought);
 
 router.route('/:thoughtId/reactions')
     .post(addReaction)
+
+router.route('/:thoughtId/reactions/:reactionId')
     .delete(removeReaction);
 
 module.exports = router;
